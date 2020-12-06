@@ -8,7 +8,7 @@ number_to_uuid = {}
 uuid_to_number = {} 
 name_to_uuid = {}
 
-sets_to_reference = ['STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN']
+sets_to_reference = ['HML', 'STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN']
 for setName in sets_to_reference :
   with open(config.ROOT_DIR + 'data/sets/' + setName + '.json') as f:
     data = json.load(f)
@@ -19,9 +19,27 @@ for setName in sets_to_reference :
         number_to_uuid[setName][item['number']] = item['uuid']
         name_to_uuid[setName][item['name']] = item['uuid']
         uuid_to_number[setName][item['uuid']] = item['number']
+        for languageData in item['foreignData']:
+            if languageData['language'] == 'Spanish' and 'ES' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'French' and 'FR' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'German' and 'DE' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'Italian' and 'IT' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'Portuguese' and 'PT' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'Japanese' and 'JP' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'Korean' and 'KO' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'Russian' and 'RU' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+            elif languageData['language'] == 'Chinese' and 'ZH' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
 
-
-availableSetsCodes = ['STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN']
+availableSetsCodes = ['HML', 'STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN']
 
 def trigram_edition_code_test( string_in ):
     return (len(string_in) == 3 and string_in.upper().isupper() and string_in in availableSetsCodes)
@@ -82,9 +100,12 @@ class collections :
         card=card
 
         if setCode:
-            if (self.content[setCode]) != []:
-                self.content[setCode].append([card.uuid, card.condition, card.language, card.modifications])
-            else :
+            try :
+                if (self.content[setCode]) != []:
+                    self.content[setCode].append([card.uuid, card.condition, card.language, card.modifications])
+                else :
+                    self.content[setCode] = [[card.uuid, card.condition, card.language, card.modifications]]
+            except KeyError:
                 self.content[setCode] = [[card.uuid, card.condition, card.language, card.modifications]]
         else:
             pass
@@ -122,7 +143,7 @@ class collections :
                     if trigram_edition_code_test(line_args[0]):
                         edition_code = line_args[0]
                         line_args = line_args[1:]
-                    elif is_number_test(line_args[0]):
+                    if is_number_test(line_args[0]):
                         card_number = line_args[0]
                         card = True
                         line_args = line_args[1:]
@@ -143,7 +164,7 @@ class collections :
                             card_language = line_args[-i]
                             del line_args[-i] 
                 if card : # Case where card was described with a number in a set
-                    print('- set ' + edition_code +' =/= carte '+ card_number)
+                    print('- set ' + edition_code +' =/= carte '+ card_number + ' / ' + card_language)
                     card_uuid = number_to_uuid[edition_code][card_number]
                     metadata = []
                     if card_variation :
@@ -152,14 +173,17 @@ class collections :
                     for i in range(number_of_cards):
                         self.add_card_with(new_card, edition_code)
                         print("  " + card_reference[edition_code][card_uuid]['name'] + ' : ' + 'https://scryfall.com/card/' + edition_code.lower() +'/' + str(card_reference[edition_code][card_uuid]['number']))
-                        print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['name'].replace(' ', '-') )
+                        if card_language == 'EN':
+                            print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['name'].replace(' ', '-') )
+                        else :
+                            print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['foreignName'][card_language].replace(' ', '-') )
                         parsed_cards.append( ["" + card_reference[edition_code][card_uuid]['name'], "https://scryfall.com/card/" + edition_code.lower() +"/" + str(card_reference[edition_code][card_uuid]['number'])])
                 else :   # Case where card, if there is one, was not described with a number in a set
                     card_name = ' '.join(line_args)
                     if len(card_name) > 0:
                         card = True
                     if card :
-                        print('- set ' + edition_code +' / carte '+ card_name)
+                        print('- set ' + edition_code +' / carte '+ card_name + ' / ' + card_language)
                         card_uuid = name_to_uuid[edition_code][card_name]
                         card_number = uuid_to_number[edition_code][card_uuid]
                         metadata = []
@@ -169,7 +193,13 @@ class collections :
                         for i in range(number_of_cards):
                             self.add_card_with(new_card, edition_code)
                             print("  " + card_name + ' : ' + 'https://scryfall.com/card/' + edition_code.lower() +'/' + card_number )
-                            print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_name.replace(' ', '-') )
+                            if card_language == 'EN':
+                                print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_name.replace(' ', '-') )
+                            else :
+                                try :
+                                    print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['foreignName'][card_language].replace(' ', '-') )     
+                                except KeyError:
+                                    print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_name.replace(' ', '-') )     
                             metadata = [card_language, card_condition]
                             if card_variation :
                                 metadata.append(card_variation)

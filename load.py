@@ -10,7 +10,7 @@ card_reference = {}
 name_to_uuid = {}
 uuid_to_number = {}
 # This is here that range of sets to initialise should be set.
-sets_to_reference = ['STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN']
+sets_to_reference = ['HML', 'STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN']
 for setName in sets_to_reference :
   with open(config.ROOT_DIR + 'data/sets/' + setName + '.json') as f:
     data = json.load(f)
@@ -24,10 +24,49 @@ for setName in sets_to_reference :
         number_to_uuid[setName][item['number']] = item['uuid']
         name_to_uuid[setName][item['name']] = item['uuid']
         uuid_to_number[setName][item['uuid']] = item['number']
+        foreignName = {}
+        for languageData in item['foreignData']:
+            if languageData['language'] == 'Spanish' and 'ES' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'ES'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'French' and 'FR' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'FR'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'German' and 'DE' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'DE'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'Italian' and 'IT' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'IT'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'Portuguese' and 'PT' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'PT'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'Japanese' and 'JP' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'JP'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'Korean' and 'KO' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'KO'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'Russian' and 'RU' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'RU'
+                foreignName[language] = languageData['name']
+            elif languageData['language'] == 'Chinese' and 'ZH' in config.languages_to_reference:
+                name_to_uuid[setName][languageData['name']] = item['uuid']
+                language = 'ZH'
+                foreignName[language] = languageData['name']
         card_reference[setName][item['uuid']] = {'name' : item['name'],
                                                 'colorIdentity' : item['colorIdentity'],
                                                 'convertedManaCost' : item['convertedManaCost'],
                                                 'legalities' : item['legalities'],
+                                                'foreignName' : foreignName,
                                                 'number' : item['number'],
                                                 'rarity' : item['rarity'],
                                                 'setCode' : item['setCode'],
