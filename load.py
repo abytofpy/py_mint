@@ -1,7 +1,7 @@
 import json
 import config
 from openpyxl import Workbook
-from pm_collections import collections
+from pm_collections import collections, define_card_from_set_and_number
 from pm_card import card
 
 #### Card Pool initialisation ####
@@ -91,19 +91,29 @@ for setName in sets_to_reference :
         except :
             pass
 #### End of reference initialisation ####
-                                      
-decks_to_add = ['MysticIntellect_C19.json']
 
+# Tests begin here                                      
+
+decks_to_add = ['MysticIntellect_C19.json']
 
 test_collec = collections('test')
 parsed_cards = test_collec.from_parsed_source('additions', card_reference)
-parsed_cards = test_collec.from_parsed_source('deck_comm_legends', card_reference)
-test_collec.save('test.json')
+#parsed_cards = test_collec.from_parsed_source('deck_comm_legends', card_reference)
+#test_collec.save('test.json')
 
-
+# Test Output to excel
 workbook = Workbook()
 sheet = workbook.active
 for i,card in enumerate(parsed_cards):
     sheet.cell(row=i+1, column=1).value = card[0]
     sheet.cell(row=i+1, column=2).value = card[1]
 workbook.save(filename="test.xlsx")
+
+#test_collec.list_cards(card_reference)
+
+test_collec.save('test.json')
+card_to_move = define_card_from_set_and_number('TMP', '290', 'NM', 'EN', [])
+test_collec2 = collections('test2')
+test_collec.move_card_from_self_to_destination_replace_with_proxy(card_to_move, 'TMP', test_collec2) # Hack to be removed after
+test_collec.save('test.json')
+test_collec2.save('test2.json')

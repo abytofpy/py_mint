@@ -54,11 +54,17 @@ def is_a_condition_of_card_test(string_in):
     return(string_in in ['MT', 'NM', 'EX', 'GD', 'LP', 'PL', 'PO'])
 
 def is_a_variation_of_card_test(string_in):
-    return(string_in in ['Alt', 'Ext', 'Foil', 'Prox'])
+    return(string_in in ['Alt', 'Ext', 'Foil', 'Proxy'])
 
 def is_a_language_test(string_in):
     return(string_in in ['EN', 'ES', 'FR', 'DE', 'IT', 'PT', 'JP', 'KO', 'RU', 'ZH' ])
 
+def define_card_from_set_and_number(set_name, card_number, card_condition, card_language, card_modifications):
+    """
+    docstring
+    """
+    card_uuid = number_to_uuid[set_name][card_number]
+    return(pm_card.card(card_uuid, card_condition, card_language, card_modifications))
 
 class collections :
     def __init__(self, name):
@@ -110,14 +116,39 @@ class collections :
         else:
             pass
 
-
-    def remove_card_with_(self, card):
+    def remove_card_with_(self, card, setCode):
         """
         docstring
         """
+        self.content[setCode].remove(card)
         pass
 
+    def move_card_from_self_to_destination_replace_with_proxy(self, card, setCode, destination):
+        """
+        docstring
+        """
+        card_uuid = card.uuid
+        card_condition = card.condition
+        card_language = card.language
+        modifications = card.modifications
+
+        proxy_card = pm_card.card(card_uuid, card_condition, card_language, ['Proxy',{'destination' : destination.name}])
+        transferred_card = pm_card.card(card_uuid, card_condition, card_language, modifications)
+        try :
+            self.add_card_with(proxy_card, setCode)
+        except :
+            print("error1")
+        try :
+            destination.add_card_with(transferred_card, setCode)
+        except :
+            print('error2')
+            self.remove_card_with_(proxy_card, setCode)
+            self.add_card_with(transferred_card, setCode)
+
     def from_parsed_source(self, source_file, card_reference=None):
+        """
+        docstring
+        """
         with open(config.ROOT_DIR + 'data/input/' + source_file + '.txt', 'r') as f:
             edition_code = False
             parsed_cards = []
@@ -241,16 +272,3 @@ class collections :
                                                                                                                     card_language = card_language,
                                                                                                                     card_convertedManaCost = str(int(card_convertedManaCost)),
                                                                                                                     card_colorIdentity = card_colorIdentity ))
-
-                # card_reference[setName][item['uuid']] = {'name' : item['name'],
-                #                                 'colorIdentity' : item['colorIdentity'],
-                #                                 'convertedManaCost' : item['convertedManaCost'],
-                #                                 'legalities' : item['legalities'],
-                #                                 'foreignName' : foreignName,
-                #                                 'number' : item['number'],
-                #                                 'rarity' : item['rarity'],
-                #                                 'setCode' : item['setCode'],
-                #                                 'subtypes' : item['subtypes'],
-                #                                 'supertypes' : item['supertypes'],
-                #                                 'types' : item['types'],
-                #                                 'uuid' : item['uuid'] }
