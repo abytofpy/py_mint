@@ -54,7 +54,7 @@ def is_a_condition_of_card_test(string_in):
     return(string_in in ['MT', 'NM', 'EX', 'GD', 'LP', 'PL', 'PO'])
 
 def is_a_variation_of_card_test(string_in):
-    return(string_in in ['Alt', 'Ext', 'Foil'])
+    return(string_in in ['Alt', 'Ext', 'Foil', 'Prox'])
 
 def is_a_language_test(string_in):
     return(string_in in ['EN', 'ES', 'FR', 'DE', 'IT', 'PT', 'JP', 'KO', 'RU', 'ZH' ])
@@ -139,7 +139,7 @@ class collections :
                     default_card_language = line
                 else :
                     line_args = line.split(' ')
-                    len_args = len(line_args)
+                    # len_args = len(line_args)
                     if trigram_edition_code_test(line_args[0]):
                         edition_code = line_args[0]
                         line_args = line_args[1:]
@@ -207,3 +207,50 @@ class collections :
         return(parsed_cards)
 
     
+    def list_cards(self,card_reference):
+        """
+        docstring
+        """
+        print("- " + self.name + " :")
+        sets = self.content.keys()
+        for set_name in sets :
+            for card in self.content[set_name]:
+                card_uuid = card[0]
+                card_condition = card[1]
+                card_language  = card[2]
+                card_modifiers = card[3]
+                card_info_from_ref = card_reference[set_name][card_uuid]
+                if card_language == 'EN' :
+                    card_name = card_info_from_ref['name']
+                else :
+                    try :
+                        card_name = card_info_from_ref['foreignName'][card_language]
+                    except :
+                        print(card_name)
+                card_rarity = card_info_from_ref['rarity']
+                card_colorIdentity = card_info_from_ref['colorIdentity']
+                card_convertedManaCost = card_info_from_ref['convertedManaCost']
+                card_number = card_info_from_ref['number']
+                print(" {card_name} [{set_name} - {card_number}] : {card_rarity} {card_modifiers} - {card_condition} condition, {card_language} - {card_convertedManaCost} cmc - {card_colorIdentity} ".format(
+                                                                                                                    card_name = card_name,
+                                                                                                                    set_name = set_name,
+                                                                                                                    card_number = card_number,
+                                                                                                                    card_rarity = card_rarity,
+                                                                                                                    card_modifiers = ', '.join(card_modifiers),
+                                                                                                                    card_condition = card_condition,
+                                                                                                                    card_language = card_language,
+                                                                                                                    card_convertedManaCost = str(int(card_convertedManaCost)),
+                                                                                                                    card_colorIdentity = card_colorIdentity ))
+
+                # card_reference[setName][item['uuid']] = {'name' : item['name'],
+                #                                 'colorIdentity' : item['colorIdentity'],
+                #                                 'convertedManaCost' : item['convertedManaCost'],
+                #                                 'legalities' : item['legalities'],
+                #                                 'foreignName' : foreignName,
+                #                                 'number' : item['number'],
+                #                                 'rarity' : item['rarity'],
+                #                                 'setCode' : item['setCode'],
+                #                                 'subtypes' : item['subtypes'],
+                #                                 'supertypes' : item['supertypes'],
+                #                                 'types' : item['types'],
+                #                                 'uuid' : item['uuid'] }
