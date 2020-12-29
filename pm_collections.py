@@ -272,3 +272,23 @@ class collections :
                                                                                                                     card_language = card_language,
                                                                                                                     card_convertedManaCost = str(int(card_convertedManaCost)),
                                                                                                                     card_colorIdentity = card_colorIdentity ))
+
+    def list_cards_edhrec_format(self,card_reference):
+        """
+        docstring
+        """
+        print("- " + self.name + " :\n")
+        sets = self.content.keys()
+        for set_name in sets :
+            for card in self.content[set_name]:
+                card_uuid = card[0]
+                card_language  = card[2]
+                card_info_from_ref = card_reference[set_name][card_uuid]
+                if card_language == 'EN' :
+                    card_name = card_info_from_ref['name']
+                else :
+                    try :
+                        card_name = card_info_from_ref['foreignName'][card_language]
+                    except :
+                        print(card_name)
+                print("1 {card_name}".format(card_name = card_name ))

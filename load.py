@@ -111,9 +111,12 @@ workbook.save(filename="test.xlsx")
 
 #test_collec.list_cards(card_reference)
 
-test_collec.save('test.json')
-card_to_move = define_card_from_set_and_number('TMP', '290', 'NM', 'EN', [])
-test_collec2 = collections('test2')
-test_collec.move_card_from_self_to_destination_replace_with_proxy(card_to_move, 'TMP', test_collec2) # Hack to be removed after
-test_collec.save('test.json')
-test_collec2.save('test2.json')
+# test card movements with token creation :
+# test_collec.save('test.json')
+# card_to_move = define_card_from_set_and_number('TMP', '290', 'NM', 'EN', [])
+# test_collec2 = collections('test2')
+# test_collec.move_card_from_self_to_destination_replace_with_proxy(card_to_move, 'TMP', test_collec2) # Hack to be removed after
+# test_collec.save('test.json')
+# test_collec2.save('test2.json')
+
+test_collec.list_cards_edhrec_format(card_reference)
