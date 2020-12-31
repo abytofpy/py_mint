@@ -1,7 +1,7 @@
 import json
 from config import sets_to_reference, ROOT_DIR, languages_to_reference
 from openpyxl import Workbook
-from pm_collections import collections, define_card_from_set_and_number
+from pm_collections import collections
 from pm_card import card
 
 #### Card Pool initialisation ####

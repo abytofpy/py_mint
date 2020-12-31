@@ -4,11 +4,11 @@ import json
 import os.path
 
 class card :
-    def __init__(self, uuid, condition, language, modifications=[]):
+    def __init__(self, card_set, card_name, condition, language, modifications=[]):
         """
         """
-        self.uuid = uuid
-        #self.name = name
+        self.set = card_set
+        self.name = card_name
         self.condition = condition
         self.language = language
         self.modifications = modifications

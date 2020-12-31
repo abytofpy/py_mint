@@ -7,17 +7,19 @@ import pm_card
 number_to_uuid = {}
 uuid_to_number = {} 
 name_to_uuid = {}
-
+name_to_number= {}
 for setName in sets_to_reference :
   with open(ROOT_DIR + 'data/sets/' + setName + '.json') as f:
     data = json.load(f)
     number_to_uuid[setName]= {}
     name_to_uuid[setName]= {}
     uuid_to_number[setName]= {}
+    name_to_number[setName]= {}
     for item in data['data']['cards']:
         number_to_uuid[setName][item['number']] = item['uuid']
         name_to_uuid[setName][item['name']] = item['uuid']
         uuid_to_number[setName][item['uuid']] = item['number']
+        name_to_number[setName][item['name']] = item['number']
         for languageData in item['foreignData']:
             if languageData['language'] == 'Spanish' and 'ES' in languages_to_reference:
                 name_to_uuid[setName][languageData['name']] = item['uuid']
@@ -56,12 +58,12 @@ def is_a_variation_of_card_test(string_in):
 def is_a_language_test(string_in):
     return(string_in in ['EN', 'ES', 'FR', 'DE', 'IT', 'PT', 'JP', 'KO', 'RU', 'ZH' ])
 
-def define_card_from_set_and_number(set_name, card_number, card_condition, card_language, card_modifications):
-    """
-    docstring
-    """
-    card_uuid = number_to_uuid[set_name][card_number]
-    return(pm_card.card(card_uuid, card_condition, card_language, card_modifications))
+# def define_card_from_set_and_number(set_name, card_number, card_condition, card_language, card_modifications):
+#     """
+#     docstring
+#     """
+#     card_uuid = number_to_uuid[set_name][card_number]
+#     return(pm_card.card(card_uuid, card_condition, card_language, card_modifications))
 
 class collections :
     def __init__(self, name):
@@ -105,11 +107,11 @@ class collections :
         if setCode:
             try :
                 if (self.content[setCode]) != []:
-                    self.content[setCode].append([card.uuid, card.condition, card.language, card.modifications])
+                    self.content[setCode].append([card.set, card.name, card.condition, card.language, card.modifications])
                 else :
-                    self.content[setCode] = [[card.uuid, card.condition, card.language, card.modifications]]
+                    self.content[setCode] = [[card.set, card.name, card.condition, card.language, card.modifications]]
             except KeyError:
-                self.content[setCode] = [[card.uuid, card.condition, card.language, card.modifications]]
+                self.content[setCode] = [[card.set, card.name, card.condition, card.language, card.modifications]]
         else:
             pass
 
@@ -124,13 +126,14 @@ class collections :
         """
         docstring
         """
-        card_uuid = card.uuid
+        card_set = card.set
+        card_name = card.name
         card_condition = card.condition
         card_language = card.language
         modifications = card.modifications
 
-        proxy_card = pm_card.card(card_uuid, card_condition, card_language, ['Proxy',{'destination' : destination.name}])
-        transferred_card = pm_card.card(card_uuid, card_condition, card_language, modifications)
+        proxy_card = pm_card.card(card_set, card_name, card_condition, card_language, ['Proxy',{'destination' : destination.name}])
+        transferred_card = pm_card.card(card_set, card_name, card_condition, card_language, modifications)
         try :
             self.add_card_with(proxy_card, setCode)
         except :
@@ -197,11 +200,12 @@ class collections :
                     try :
                         card_uuid = number_to_uuid[edition_code][card_number]
                     except KeyError:
-                        print ('Set Key Error - Maybe set {setname} data was not downloaded from https://mtgjson.com/api/v5/{setname}.json ?'.format(edition_code,edition_code))
+                        print ('Set Key Error - Maybe set {setName} data was not downloaded from https://mtgjson.com/api/v5/{setName}.json ?'.format(edition_code,edition_code))
                     metadata = []
                     if card_variation :
-                        metadata.append(card_variation)  
-                    new_card = pm_card.card(card_uuid, card_condition, card_language, metadata)
+                        metadata.append(card_variation)
+                    card_name = card_reference[edition_code][card_uuid]['name']
+                    new_card = pm_card.card(edition_code, card_name, card_condition, card_language, metadata)
                     for i in range(number_of_cards):
                         self.add_card_with(new_card, edition_code)
                         print("  " + card_reference[edition_code][card_uuid]['name'] + ' : ' + 'https://scryfall.com/card/' + edition_code.lower() +'/' + str(card_reference[edition_code][card_uuid]['number']))
@@ -224,7 +228,7 @@ class collections :
                         metadata = []
                         if card_variation :
                             metadata.append(card_variation)  
-                        new_card = pm_card.card(card_uuid, card_condition, card_language, metadata)
+                        new_card = pm_card.card(edition_code, card_name, card_condition, card_language, metadata)
                         for i in range(number_of_cards):
                             self.add_card_with(new_card, edition_code)
                             print("  " + card_name + ' : ' + 'https://scryfall.com/card/' + edition_code.lower() +'/' + card_number )
@@ -290,8 +294,8 @@ class collections :
         print(str(number_of_cards) + " cards.\n")
         for set_name in sets :
             for card in self.content[set_name]:
-                card_uuid = card[0]
-                card_language  = card[2]
+                card_uuid = name_to_uuid[set_name][card[1]]
+                card_language  = card[3]
                 card_info_from_ref = card_reference[set_name][card_uuid]
                 error = False
                 if card_language == 'EN' :
