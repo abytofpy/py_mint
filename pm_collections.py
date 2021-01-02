@@ -328,3 +328,29 @@ class collections :
                         error = True
                 if not error:
                     print("1 {card_name}".format(card_name = card_name ))
+
+    def look_for_card(self,cardname, cardset = None, resultset = None):
+        """
+        """
+        if not resultset:
+            resultset = []
+        print('.Looking in '+ self.name)
+        if cardset:
+            for card in self.content[cardset]:
+                if card[1] == cardname :
+                    resultset.append([self.name,card])
+        else :
+            for cardset in self.content.keys():
+                for card in self.content[cardset]:
+                    if card[1] == cardname :
+                        resultset.append([self.name,card])
+        return(resultset)
+
+def look_for_card_in_collections(cardname, collections, cardset = None):
+    """
+    """
+    resultset = None
+    for collection in collections:
+        resultset = collection.look_for_card(cardname, cardset, resultset)
+    return(resultset)
+

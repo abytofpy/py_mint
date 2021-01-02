@@ -1,8 +1,9 @@
 import json
 from config import sets_to_reference, ROOT_DIR, languages_to_reference
 from openpyxl import Workbook
-from pm_collections import collections
+from pm_collections import collections, look_for_card_in_collections
 from pm_card import card
+import inspect
 
 #### Card Pool initialisation ####
 number_to_uuid = {}
@@ -121,4 +122,17 @@ workbook.save(filename="Teshar.xlsx")
 # test_collec2.save('test2.json')
 
 Teshar_deck.save('Teshar.json')
-Teshar_deck.list_cards_edhrec_format(card_reference)
+#Teshar_deck.list_cards_edhrec_format(card_reference)
+
+print(" ------------------------------------------")
+print(" Test of research of cards in collections :")
+objects = dir()
+collections = [ eval(x) for x in objects if isinstance(eval(x), collections)] #inspect.isclass(x) == inspect.isclass(Teshar_deck) ]
+res = look_for_card_in_collections("Teshar, Ancestor's Apostle", collections)
+if len(res) > 0 :
+    print ('.Found results:')
+    for element in res :
+        print (" - deck'{name}' : card from {setname}, condition {condition}, in {language}".format(name = element[0],
+                                                                                                setname = element[1][0],
+                                                                                                condition = element[1][2],
+                                                                                                language = element[1][3]))
