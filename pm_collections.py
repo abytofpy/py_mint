@@ -281,7 +281,27 @@ class collections :
                                                                                                                     card_convertedManaCost = str(int(card_convertedManaCost)),
                                                                                                                     card_colorIdentity = card_colorIdentity ))
 
-    def list_cards_edhrec_format(self,card_reference):
+    def list_cards_deckstats_format(self,card_reference):
+        """
+        docstring
+        """
+        print(">> " + self.name + " collection :\n")
+        sets = self.content.keys()
+        number_of_cards = 0
+        for set_name in sets :
+            for card in self.content[set_name]:
+                number_of_cards += 1
+        print(str(number_of_cards) + " cards.\n")
+        for set_name in sets :
+            for card in self.content[set_name]:
+                card_uuid = name_to_uuid[set_name][card[1]]
+                card_language  = card[3]
+                card_info_from_ref = card_reference[set_name][card_uuid]
+                error = False
+                card_name = card_info_from_ref['name']
+                print("1 {card_name}".format(card_name = card_name ))
+
+    def list_cards(self,card_reference):
         """
         docstring
         """
