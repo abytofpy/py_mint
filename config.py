@@ -1,3 +1,4 @@
 ROOT_DIR = '../clojure_mint/resources/'
-sets_to_reference = ['TSP', 'ISD', 'CHK', 'THS', 'C14','C17', 'AER', 'M15', 'HML', 'STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN', 'C18', 'C19', 'BFZ', 'AKH', 'KLD', 'ZNC', 'EMA', 'KLD', 'ODY', 'EXO', '5DN', 'JUD', 'CNS','NPH','STH','ICE','BOK','WWK','INV','WTH','MRD','DST','MBS', 'SOM', 'MIR', 'LRW', 'MMA', 'NEM', 'C20' ]
+sets_to_reference = [ 'MD1', 'CON', '8ED','ARB','SHM','AVR','SOI','RAV','GPT','DIS','SS1','C15', 'C16', 'RIX','AER','GRN','KTK','XLN','TSP', 'ISD', 'CHK', 'THS', 'C14','C17', 'M15', 'HML', 'STH', '4ED', 'ALL', 'MIR', 'REV', 'TMP', 'ICE', 'EXO', 'VIS', 'WTH', 'CMR', 'KLR', 'ZNR', 'AKR', '2XM', 'M21', 'IKO', 'THB', 'ELD', 'M20', 'MH1', 'WAR', 'RNA', 'UMA', 'GRN', 'M19', 'DOM', 'RIX', 'XLN', 'C18', 'C19', 'BFZ', 'AKH', 'KLD', 'ZNC', 'EMA', 'KLD', 'ODY', 'EXO', '5DN', 'JUD', 'CNS','NPH','STH','ICE','BOK','WWK','INV','WTH','MRD','DST','MBS', 'SOM', 'MIR', 'LRW', 'MMA', 'NEM', 'C20' ]
+#sets_to_reference = ['CON']
 languages_to_reference = ['EN', 'FR']

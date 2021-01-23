@@ -1,15 +1,23 @@
 import json
-from config import sets_to_reference, ROOT_DIR, languages_to_reference
-import json
 import os.path
 import pm_card
+from tqdm import tqdm
+from config import sets_to_reference, ROOT_DIR, languages_to_reference
 
 number_to_uuid = {}
 uuid_to_number = {} 
 name_to_uuid = {}
 name_to_number= {}
-for setName in sets_to_reference :
+for setName in tqdm(sets_to_reference) :
+  # Fix 1 on WIN systems since CON.json is reserved :
+  if setName == 'CON':
+      setName = 'CON_'
+  # End Fix 1
   with open(ROOT_DIR + 'data/sets/' + setName + '.json') as f:
+    # Fix 2 on WIN systems since CON.json is reserved :
+    if setName == 'CON_':
+      setName = 'CON'
+    # End Fix 2
     data = json.load(f)
     number_to_uuid[setName]= {}
     name_to_uuid[setName]= {}
@@ -75,9 +83,16 @@ class collections :
             for setCode in sets_to_reference:
                 self.content[setCode] = []
         else:
-            self.File = open(ROOT_DIR + 'data/collections/' + self.name + '.json', 'r')
-            self.content = json.load(self.File)
-            self.File.close()
+            if os.path.getsize(ROOT_DIR + 'data/collections/' + self.name + '.json') :
+                self.File = open(ROOT_DIR + 'data/collections/' + self.name + '.json', 'r')
+                self.content = json.load(self.File)
+                self.File.close()
+            else :
+                self.File = open(ROOT_DIR + 'data/collections/' + self.name + '.json', 'w')
+                self.File.close()
+                self.content = {}
+                for setCode in sets_to_reference:
+                    self.content[setCode] = []
 
     def read(self, name):
         """
@@ -204,6 +219,7 @@ class collections :
                     metadata = []
                     if card_variation :
                         metadata.append(card_variation)
+                    
                     card_name = card_reference[edition_code][card_uuid]['name']
                     new_card = pm_card.card(edition_code, card_name, card_condition, card_language, metadata)
                     for i in range(number_of_cards):
@@ -222,8 +238,18 @@ class collections :
                     if len(card_name) > 0:
                         card = True
                     if card :
-                        print('- set ' + edition_code +' / carte '+ card_name + ' / ' + card_language)
-                        card_uuid = name_to_uuid[edition_code][card_name]
+                        try :
+                            print('- set ' + edition_code +' / carte '+ card_name + ' / ' + card_language)
+                        except TypeError:
+                            print ('Error. ed_code, card_name, card_langage :')
+                            print (str(edition_code))
+                            print (str(card_name))
+                            print (str(card_language))
+                        try :
+                            card_uuid = name_to_uuid[edition_code][card_name]
+                        except KeyError:
+                            print('Missing key - perhaps a set is missing from the sets_to_reference in config module ?')
+                            exit(0)
                         card_number = uuid_to_number[edition_code][card_uuid]
                         metadata = []
                         if card_variation :
@@ -295,39 +321,37 @@ class collections :
         for set_name in sets :
             for card in self.content[set_name]:
                 card_uuid = name_to_uuid[set_name][card[1]]
-                card_language  = card[3]
                 card_info_from_ref = card_reference[set_name][card_uuid]
-                error = False
                 card_name = card_info_from_ref['name']
                 print("1 {card_name}".format(card_name = card_name ))
 
-    def list_cards(self,card_reference):
-        """
-        docstring
-        """
-        print(">> " + self.name + " collection :\n")
-        sets = self.content.keys()
-        number_of_cards = 0
-        for set_name in sets :
-            for card in self.content[set_name]:
-                number_of_cards += 1
-        print(str(number_of_cards) + " cards.\n")
-        for set_name in sets :
-            for card in self.content[set_name]:
-                card_uuid = name_to_uuid[set_name][card[1]]
-                card_language  = card[3]
-                card_info_from_ref = card_reference[set_name][card_uuid]
-                error = False
-                if card_language == 'EN' :
-                    card_name = card_info_from_ref['name']
-                else :
-                    try :
-                        card_name = card_info_from_ref['foreignName'][card_language]
-                    except :
-                        #print("Error on " + card_name)
-                        error = True
-                if not error:
-                    print("1 {card_name}".format(card_name = card_name ))
+    # def list_cards(self,card_reference):
+    #     """
+    #     docstring
+    #     """
+    #     print(">> " + self.name + " collection :\n")
+    #     sets = self.content.keys()
+    #     number_of_cards = 0
+    #     for set_name in sets :
+    #         for card in self.content[set_name]:
+    #             number_of_cards += 1
+    #     print(str(number_of_cards) + " cards.\n")
+    #     for set_name in sets :
+    #         for card in self.content[set_name]:
+    #             card_uuid = name_to_uuid[set_name][card[1]]
+    #             card_language  = card[3]
+    #             card_info_from_ref = card_reference[set_name][card_uuid]
+    #             error = False
+    #             if card_language == 'EN' :
+    #                 card_name = card_info_from_ref['name']
+    #             else :
+    #                 try :
+    #                     card_name = card_info_from_ref['foreignName'][card_language]
+    #                 except :
+    #                     #print("Error on " + card_name)
+    #                     error = True
+    #             if not error:
+    #                 print("1 {card_name}".format(card_name = card_name ))
 
     def look_for_card(self,cardname, cardset = None, resultset = None):
         """
@@ -354,3 +378,5 @@ def look_for_card_in_collections(cardname, collections, cardset = None):
         resultset = collection.look_for_card(cardname, cardset, resultset)
     return(resultset)
 
+def establish_inventory(collections):
+    pass
