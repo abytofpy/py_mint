@@ -23,6 +23,7 @@ for setName in tqdm(sets_to_reference) :
     name_to_uuid[setName]= {}
     uuid_to_number[setName]= {}
     name_to_number[setName]= {}
+ 
     for item in data['data']['cards']:
         number_to_uuid[setName][item['number']] = item['uuid']
         name_to_uuid[setName][item['name']] = item['uuid']
@@ -47,7 +48,17 @@ for setName in tqdm(sets_to_reference) :
                 name_to_uuid[setName][languageData['name']] = item['uuid']
             elif languageData['language'] == 'Chinese' and 'ZH' in languages_to_reference:
                 name_to_uuid[setName][languageData['name']] = item['uuid']
-
+    # Token version of the set : setname is preceded by 'T'
+    number_to_uuid['T'+setName]= {}
+    name_to_uuid['T'+setName]= {}
+    uuid_to_number['T'+setName]= {}
+    name_to_number['T'+setName]= {}  
+    for item in data['data']['tokens']:
+        number_to_uuid['T'+setName][item['number']] = item['uuid']
+        name_to_uuid['T'+setName][item['name']] = item['uuid']
+        uuid_to_number['T'+setName][item['uuid']] = item['number']
+        name_to_number['T'+setName][item['name']] = item['number']
+   
 def trigram_edition_code_test( string_in ):
     return (len(string_in) == 3 and string_in.upper().isupper() and string_in in sets_to_reference)
 

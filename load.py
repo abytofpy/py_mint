@@ -24,7 +24,6 @@ for setName in sets_to_reference :
         number_to_uuid[setName]= {}
         card_reference[setName]= {}
         uuid_to_number[setName]= {}
-
         for item in data['data']['cards']:
             #print(item)
             number_to_uuid[setName][item['number']] = item['uuid']
@@ -96,6 +95,17 @@ for setName in sets_to_reference :
                 card_reference[setName][item['uuid']]['manaCost'] = item['manaCost']
             except :
                 pass
+        # Token version of the set : setname is preceded by 'T'    
+        name_to_uuid['T'+setName]= {} 
+        number_to_uuid['T'+setName]= {}
+        card_reference['T'+setName]= {}
+        uuid_to_number['T'+setName]= {}   
+        for item in data['data']['tokens']:
+            number_to_uuid['T'+setName][item['number']] = item['uuid']
+            name_to_uuid['T'+setName][item['name']] = item['uuid']
+            uuid_to_number['T'+setName][item['uuid']] = item['number']
+
+            
 ### End of reference initialisation ####
 
 # Tests begin here                                      
