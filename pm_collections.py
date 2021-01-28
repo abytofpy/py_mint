@@ -58,9 +58,17 @@ for setName in tqdm(sets_to_reference) :
         name_to_uuid['T'+setName][item['name']] = item['uuid']
         uuid_to_number['T'+setName][item['uuid']] = item['number']
         name_to_number['T'+setName][item['name']] = item['number']
-   
+#        card_reference[setName][item['uuid']] = {'name' : item['name'],
+#                                                    'colorIdentity' : item['colorIdentity'],
+#                                                    'convertedManaCost' : 0,
+#                                                    'number' : item['number'],
+#                                                    'setCode' : item['setCode'],
+#                                                    'subtypes' : item['subtypes'],
+#                                                    'supertypes' : item['supertypes'],
+#                                                    'types' : item['types'],
+#                                                    'uuid' : item['uuid'] }
 def trigram_edition_code_test( string_in ):
-    return (len(string_in) == 3 and string_in.upper().isupper() and string_in in sets_to_reference)
+    return ((len(string_in) == 3 or len(string_in) == 4) and string_in.upper().isupper() and (string_in in sets_to_reference or string_in[1:] in sets_to_reference ))
 
 def is_number_test( string_in ):
     return (string_in.isdigit()) 
@@ -230,7 +238,7 @@ class collections :
                     metadata = []
                     if card_variation :
                         metadata.append(card_variation)
-                    
+
                     card_name = card_reference[edition_code][card_uuid]['name']
                     new_card = pm_card.card(edition_code, card_name, card_condition, card_language, metadata)
                     for i in range(number_of_cards):
@@ -239,10 +247,13 @@ class collections :
                         if card_language == 'EN':
                             print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['name'].replace(' ', '-') )
                         else :
-                            try :
-                                print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['foreignName'][card_language].replace(' ', '-') )
-                            except :
-                                print("  Card Name Replacement error for foreign langage " + card_language )
+                            if 'Token' in card_reference[edition_code][card_uuid]['types']:
+                                print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['name'].replace(' ', '-') )
+                            else :
+                                try :
+                                    print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['foreignName'][card_language].replace(' ', '-') )
+                                except :
+                                    print("  Card Name Replacement error for foreign langage " + card_language )
                         parsed_cards.append( ["" + card_reference[edition_code][card_uuid]['name'], "https://scryfall.com/card/" + edition_code.lower() +"/" + str(card_reference[edition_code][card_uuid]['number'])])
                 elif not trigram_edition_code_test(line):   # Case where card, if there is one, was not described with a number in a set
                     card_name = ' '.join(line_args)

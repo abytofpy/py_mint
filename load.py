@@ -104,7 +104,15 @@ for setName in sets_to_reference :
             number_to_uuid['T'+setName][item['number']] = item['uuid']
             name_to_uuid['T'+setName][item['name']] = item['uuid']
             uuid_to_number['T'+setName][item['uuid']] = item['number']
-
+            card_reference['T'+setName][item['uuid']] = {'name' : item['name'],
+                                                    'colorIdentity' : item['colorIdentity'],
+                                                    'convertedManaCost' : 0,
+                                                    'number' : item['number'],
+                                                    'setCode' : item['setCode'],
+                                                    'subtypes' : item['subtypes'],
+                                                    'supertypes' : item['supertypes'],
+                                                    'types' : item['types'],
+                                                    'uuid' : item['uuid'] }
             
 ### End of reference initialisation ####
 
@@ -112,10 +120,10 @@ for setName in sets_to_reference :
 
 #decks_to_add = ['MysticIntellect_C19.json']
 
-#test_collec = collections('test')
-#parsed_cards = test_collec.from_parsed_source('additions', card_reference)
+test_collec = collections('test')
+parsed_cards = test_collec.from_parsed_source('additions_23122020', card_reference)
 #parsed_cards = test_collec.from_parsed_source('deck_comm_legends', card_reference)
-#test_collec.save('test.json')
+test_collec.save('test.json')
 
 Kykar_deck = collections('Kykar')
 # Loading collectino
