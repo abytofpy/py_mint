@@ -247,13 +247,13 @@ class collections :
                         if card_language == 'EN':
                             print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['name'].replace(' ', '-') )
                         else :
-                            if 'Token' in card_reference[edition_code][card_uuid]['types']:
+                            if 'Token' in card_reference[edition_code][card_uuid]['types'] or 'Emblem' in card_reference[edition_code][card_uuid]['types'] :
                                 print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['name'].replace(' ', '-') )
                             else :
                                 try :
                                     print("  https://www.cardmarket.com/fr/Magic/Products/Search?searchString=" + card_reference[edition_code][card_uuid]['foreignName'][card_language].replace(' ', '-') )
                                 except :
-                                    print("  Card Name Replacement error for foreign langage " + card_language )
+                                    pass # print("  Card Name Replacement error for foreign langage " + card_language )
                         parsed_cards.append( ["" + card_reference[edition_code][card_uuid]['name'], "https://scryfall.com/card/" + edition_code.lower() +"/" + str(card_reference[edition_code][card_uuid]['number'])])
                 elif not trigram_edition_code_test(line):   # Case where card, if there is one, was not described with a number in a set
                     card_name = ' '.join(line_args)

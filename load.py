@@ -121,7 +121,7 @@ for setName in sets_to_reference :
 #decks_to_add = ['MysticIntellect_C19.json']
 
 test_collec = collections('test')
-parsed_cards = test_collec.from_parsed_source('additions_23122020', card_reference)
+parsed_cards = test_collec.from_parsed_source('additions_29012021', card_reference)
 #parsed_cards = test_collec.from_parsed_source('deck_comm_legends', card_reference)
 test_collec.save('test.json')
 
