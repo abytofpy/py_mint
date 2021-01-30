@@ -3,23 +3,22 @@ from config import sets_to_reference, ROOT_DIR, languages_to_reference
 from openpyxl import Workbook
 from pm_collections import collections, look_for_card_in_collections
 from pm_card import card
-from pm_reference import build_reference
+from pm_reference import build_reference, download_JSON
 import inspect
 
+download_JSON(['KHM','M21'])
 reference = (card_reference, name_to_uuid, number_to_uuid, uuid_to_number) = build_reference(sets_to_reference)            
 ### End of reference initialisation ####
 
 # Tests begin here                                      
-
 #decks_to_add = ['MysticIntellect_C19.json']
-
 test_collec = collections('test')
 parsed_cards = test_collec.from_parsed_source('additions_29012021', reference)
 #parsed_cards = test_collec.from_parsed_source('deck_comm_legends', card_reference)
 test_collec.save('test.json')
 
+# Loading collection
 Kykar_deck = collections('Kykar')
-# Loading collectino
 print('Loading collection ...')
 parsed_cards = Kykar_deck.from_parsed_source('Kykar', reference)
 # Test Output to excel

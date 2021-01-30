@@ -1,6 +1,28 @@
 import config
 import json
+import os
+from tqdm import tqdm
+import requests
+from urllib.request import urlopen
 from config import sets_to_reference, ROOT_DIR, languages_to_reference
+from zipfile import ZipFile
+
+def download_JSON(sets_to_reference):
+    """Downloads JSON files from MTGAJSON to update data"""
+    print("- Downloading data from MTGAJSON -")
+    for setname in tqdm(sets_to_reference) :
+        r = requests.get('https://mtgjson.com/api/v5/'+ setname +'.json.zip')
+        zipfile = ROOT_DIR + 'data/sets/' +setname +".zip"
+        with open(zipfile, "wb") as data:
+            data.write(r.content)
+        with ZipFile(zipfile, 'r') as zipObj:
+        # Extract all the contents of zip file in current directory
+            zipObj.extractall(path=ROOT_DIR + 'data/sets/')
+        ## If file exists, delete it ##
+        if os.path.isfile(zipfile):
+            os.remove(zipfile)
+        else:    ## Show an error ##
+            print("Error: %s file not found" % zipfile)
 
 def build_reference(sets_to_reference):
     """Builds a card database from the sets list input.
@@ -11,7 +33,8 @@ def build_reference(sets_to_reference):
     name_to_uuid = {}
     uuid_to_number = {}
 
-    for setName in sets_to_reference :
+    print("- Building internal Card Reference -")
+    for setName in tqdm(sets_to_reference) :
         # Fix 1 on WIN systems since CON.json is reserved :
         if setName == 'CON':
             setName = 'CON_'
