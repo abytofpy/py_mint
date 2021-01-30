@@ -4,69 +4,6 @@ import pm_card
 from tqdm import tqdm
 from config import sets_to_reference, ROOT_DIR, languages_to_reference
 
-number_to_uuid = {}
-uuid_to_number = {} 
-name_to_uuid = {}
-name_to_number= {}
-for setName in tqdm(sets_to_reference) :
-  # Fix 1 on WIN systems since CON.json is reserved :
-  if setName == 'CON':
-      setName = 'CON_'
-  # End Fix 1
-  with open(ROOT_DIR + 'data/sets/' + setName + '.json') as f:
-    # Fix 2 on WIN systems since CON.json is reserved :
-    if setName == 'CON_':
-      setName = 'CON'
-    # End Fix 2
-    data = json.load(f)
-    number_to_uuid[setName]= {}
-    name_to_uuid[setName]= {}
-    uuid_to_number[setName]= {}
-    name_to_number[setName]= {}
- 
-    for item in data['data']['cards']:
-        number_to_uuid[setName][item['number']] = item['uuid']
-        name_to_uuid[setName][item['name']] = item['uuid']
-        uuid_to_number[setName][item['uuid']] = item['number']
-        name_to_number[setName][item['name']] = item['number']
-        for languageData in item['foreignData']:
-            if languageData['language'] == 'Spanish' and 'ES' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'French' and 'FR' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'German' and 'DE' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'Italian' and 'IT' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'Portuguese' and 'PT' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'Japanese' and 'JP' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'Korean' and 'KO' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'Russian' and 'RU' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-            elif languageData['language'] == 'Chinese' and 'ZH' in languages_to_reference:
-                name_to_uuid[setName][languageData['name']] = item['uuid']
-    # Token version of the set : setname is preceded by 'T'
-    number_to_uuid['T'+setName]= {}
-    name_to_uuid['T'+setName]= {}
-    uuid_to_number['T'+setName]= {}
-    name_to_number['T'+setName]= {}  
-    for item in data['data']['tokens']:
-        number_to_uuid['T'+setName][item['number']] = item['uuid']
-        name_to_uuid['T'+setName][item['name']] = item['uuid']
-        uuid_to_number['T'+setName][item['uuid']] = item['number']
-        name_to_number['T'+setName][item['name']] = item['number']
-#        card_reference[setName][item['uuid']] = {'name' : item['name'],
-#                                                    'colorIdentity' : item['colorIdentity'],
-#                                                    'convertedManaCost' : 0,
-#                                                    'number' : item['number'],
-#                                                    'setCode' : item['setCode'],
-#                                                    'subtypes' : item['subtypes'],
-#                                                    'supertypes' : item['supertypes'],
-#                                                    'types' : item['types'],
-#                                                    'uuid' : item['uuid'] }
 def trigram_edition_code_test( string_in ):
     return ((len(string_in) == 3 or len(string_in) == 4) and string_in.upper().isupper() and (string_in in sets_to_reference or string_in[1:] in sets_to_reference ))
 
@@ -84,13 +21,6 @@ def is_a_variation_of_card_test(string_in):
 
 def is_a_language_test(string_in):
     return(string_in in ['EN', 'ES', 'FR', 'DE', 'IT', 'PT', 'JP', 'KO', 'RU', 'ZH' ])
-
-# def define_card_from_set_and_number(set_name, card_number, card_condition, card_language, card_modifications):
-#     """
-#     docstring
-#     """
-#     card_uuid = number_to_uuid[set_name][card_number]
-#     return(pm_card.card(card_uuid, card_condition, card_language, card_modifications))
 
 class collections :
     def __init__(self, name):
@@ -179,11 +109,12 @@ class collections :
             self.remove_card_with_(proxy_card, setCode)
             self.add_card_with(transferred_card, setCode)
 
-    def from_parsed_source(self, source_file, card_reference=None):
+    def from_parsed_source(self, source_file, reference=None):
         """
         docstring
         """
         with open(ROOT_DIR + 'data/input/' + source_file + '.txt', 'r') as f:
+            (card_reference, name_to_uuid, number_to_uuid, uuid_to_number) = reference
             edition_code = False
             parsed_cards = []
             line_args = []
@@ -294,12 +225,13 @@ class collections :
         return(parsed_cards)
 
     
-    def list_cards(self,card_reference):
+    def list_cards(self,reference):
         """
         docstring
         """
         print("- " + self.name + " :")
         sets = self.content.keys()
+        (card_reference, name_to_uuid, number_to_uuid, uuid_to_number) = reference
         for set_name in sets :
             for card in self.content[set_name]:
                 card_uuid = card[0]
@@ -329,10 +261,11 @@ class collections :
                                                                                                                     card_convertedManaCost = str(int(card_convertedManaCost)),
                                                                                                                     card_colorIdentity = card_colorIdentity ))
 
-    def list_cards_deckstats_format(self,card_reference):
+    def list_cards_deckstats_format(self,reference):
         """
         docstring
         """
+        (card_reference, name_to_uuid, number_to_uuid, uuid_to_number) = reference
         print(">> " + self.name + " collection :\n")
         sets = self.content.keys()
         number_of_cards = 0
@@ -347,33 +280,6 @@ class collections :
                 card_name = card_info_from_ref['name']
                 print("1 {card_name}".format(card_name = card_name ))
 
-    # def list_cards(self,card_reference):
-    #     """
-    #     docstring
-    #     """
-    #     print(">> " + self.name + " collection :\n")
-    #     sets = self.content.keys()
-    #     number_of_cards = 0
-    #     for set_name in sets :
-    #         for card in self.content[set_name]:
-    #             number_of_cards += 1
-    #     print(str(number_of_cards) + " cards.\n")
-    #     for set_name in sets :
-    #         for card in self.content[set_name]:
-    #             card_uuid = name_to_uuid[set_name][card[1]]
-    #             card_language  = card[3]
-    #             card_info_from_ref = card_reference[set_name][card_uuid]
-    #             error = False
-    #             if card_language == 'EN' :
-    #                 card_name = card_info_from_ref['name']
-    #             else :
-    #                 try :
-    #                     card_name = card_info_from_ref['foreignName'][card_language]
-    #                 except :
-    #                     #print("Error on " + card_name)
-    #                     error = True
-    #             if not error:
-    #                 print("1 {card_name}".format(card_name = card_name ))
 
     def look_for_card(self,cardname, cardset = None, resultset = None):
         """
