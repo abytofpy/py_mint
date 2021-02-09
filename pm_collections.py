@@ -1,8 +1,11 @@
 import json
 import os.path
-import pm_card
+
 from tqdm import tqdm
-from config import sets_to_reference, ROOT_DIR, languages_to_reference
+
+import pm_card
+from config import ROOT_DIR, languages_to_reference, sets_to_reference
+
 
 def trigram_edition_code_test( string_in ):
     return ((len(string_in) == 3 or len(string_in) == 4) and string_in.upper().isupper() and (string_in in sets_to_reference or string_in[1:] in sets_to_reference ))
@@ -165,7 +168,7 @@ class collections :
                     try :
                         card_uuid = number_to_uuid[edition_code][card_number]
                     except KeyError:
-                        print ('Set Key Error - Maybe set {setName} data was not downloaded from https://mtgjson.com/api/v5/{setName}.json ?'.format(edition_code,edition_code))
+                        print ('Set Key Error - Maybe set {setName} data was not downloaded from https://mtgjson.com/api/v5/{setName}.json ?'.format(setName = edition_code))
                     metadata = []
                     if card_variation :
                         metadata.append(card_variation)
@@ -298,6 +301,87 @@ class collections :
                         resultset.append([self.name,card])
         return(resultset)
 
+
+    def traces_cards(self, reference):
+        """
+        """
+        (card_reference, name_to_uuid, number_to_uuid, uuid_to_number) = reference
+        subcollection = []
+        sets = self.content.keys()
+        for set_name in sets :
+                for card in self.content[set_name]:
+                    card_uuid = name_to_uuid[set_name][card[1]]
+                    card_info_from_ref = card_reference[set_name][card_uuid]
+                    card_name = card_info_from_ref['name']
+                    card_condition = card[2]
+                    card_language  = card[3]
+                    card_modifiers = card[4]
+                    card_set = set_name
+                    card_collection = self.name
+                    card_colorIdentity = card_info_from_ref['colorIdentity']
+                    card_convertedManaCost = card_info_from_ref['convertedManaCost']
+                    card_number = card_info_from_ref['number']
+                    try :
+                        card_legalities = card_info_from_ref['legalities']
+                    except :
+                        card_legalities = None                    
+                    try :
+                        card_foreignName = card_info_from_ref['foreignName']
+                    except :
+                        card_foreignName = None
+                    try :
+                        card_rarity = card_info_from_ref['rarity']
+                    except :
+                        card_rarity = None
+                    card_setCode = card_info_from_ref['setCode']
+                    card_subtypes = card_info_from_ref['subtypes']
+                    card_supertypes = card_info_from_ref['supertypes']
+                    card_types = card_info_from_ref['types']
+                    try :
+                        card_keywords = card_info_from_ref['keywords']
+                    except :
+                        card_keywords = None
+                    try :
+                        card_power = card_info_from_ref['power']
+                    except :
+                        card_power = None
+                    try :
+                        card_toughness = card_info_from_ref['toughness']
+                    except :
+                        card_toughness = None           
+                    try :
+                        card_manaCost = card_info_from_ref['manaCost']
+                    except :
+                        card_manaCost = None
+
+                    card_description = {'card_uuid' : card_uuid ,
+                    'card_name' : card_name ,
+                    'card_condition' : card_condition ,
+                    'card_language' : card_language ,
+                    'card_modifiers' : card_modifiers ,
+                    'card_set' : card_set ,
+                    'card_collection' : card_collection ,
+                    'card_rarity' : card_rarity ,
+                    'card_colorIdentity' : card_colorIdentity ,
+                    'card_convertedManaCost' : card_convertedManaCost ,
+                    'card_number' : card_number ,
+                    'card_legalities' : card_legalities ,
+                    'card_foreignName' : card_foreignName ,
+                    'card_number' : card_number ,
+                    'card_rarity' : card_rarity ,
+                    'card_setCode' : card_setCode ,
+                    'card_subtypes' : card_subtypes ,
+                    'card_supertypes' : card_supertypes ,
+                    'card_types' : card_types ,
+                    'card_keywords' : card_keywords ,
+                    'card_power' : card_power ,
+                    'card_power' : card_power ,
+                    'card_toughness' : card_toughness ,
+                    'card_manaCost' : card_manaCost }
+
+                    subcollection.append(card_description)
+        return(subcollection)
+
 def look_for_card_in_collections(cardname, collections, cardset = None):
     """
     """
@@ -305,6 +389,3 @@ def look_for_card_in_collections(cardname, collections, cardset = None):
     for collection in collections:
         resultset = collection.look_for_card(cardname, cardset, resultset)
     return(resultset)
-
-def establish_inventory(collections):
-    pass
