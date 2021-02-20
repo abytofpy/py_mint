@@ -1,6 +1,5 @@
 import json
-import os.path
-
+import os
 from tqdm import tqdm
 
 import pm_card
@@ -381,6 +380,36 @@ class collections :
 
                     subcollection.append(card_description)
         return(subcollection)
+
+    def remove_collection(self, reference, main_collection):
+        """
+        Merges collection with the main collection.
+        """
+        destination = main_collection
+        (card_reference, name_to_uuid, number_to_uuid, uuid_to_number) = reference
+
+        sets = self.content.keys()
+        for setCode in sets :
+                for card in self.content[setCode]:
+                    if 'Proxy' not in card[4] :
+                        card_name = card[0]
+                        card_condition = card[1]
+                        card_language  = card[2]
+                        card_modifiers = card[3]
+
+                        card_set = setCode # Some discrepencies in the ref of sets
+                        modifications = card_modifiers # and modifiers
+                        transferred_card = pm_card.card(card_set, card_name, card_condition, card_language, modifications)
+                        try :
+                            destination.add_card_with(transferred_card, setCode)
+                        except :
+                            print('Transfer error while removing collection')
+        self.content.clear()
+
+        if os.path.exists(ROOT_DIR + 'data/collections/' + self.name + '.json'):
+            os.remove(ROOT_DIR + 'data/collections/' + self.name + '.json')
+        else:
+            print("Collection file does not exist.") 
 
 def look_for_card_in_collections(cardname, collections, cardset = None):
     """
